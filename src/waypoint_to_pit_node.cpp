@@ -26,7 +26,6 @@ bool g_wp(waypoint_to_pit::waypoints::Request &req, waypoint_to_pit::waypoints::
 		return true;
 	}
 	return false;
-
 }
 
 

@@ -6,10 +6,10 @@
 // #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <string>
-#include <stdlib.h> 
+#include <stdlib.h>
 using namespace std;
 
-#define MAP_FILE "./mapp.csv"
+#define MAP_FILE "/home/himil07/catkin_ws/src/waypoint_pit_planner/src/mapp.csv"
 
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
@@ -56,7 +56,7 @@ public:
     struct coordinate  robot_position =  coordinate(10,0);
     struct coordinate pit_centre =  coordinate(650,650);
     struct coordinate2  dir_vec =  coordinate2();
-    double min_step = 0.5; //resolution of the map
+    double min_step = 2; //resolution of the map
     vector<coordinate> list_wp;
 
 
@@ -109,6 +109,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
     {
         auto res = split(line,',');
         map.push_back(res);
+        // cout<<"res:" <<res.size()<<endl;
     }
 
     // cout<<"Map_Rows: "<<map.size()<<endl;
@@ -119,21 +120,6 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 }
 
 
-    vector<vector<int> > generate_map_vec(){ //check convention
-      // cv::Mat img = cv::imread(MAP_FILE);
-        vector<vector<int> > map_vec;
-        // vector<int> tmp(img.rows, 0);
-        //  vector<vector<int> > map_vec(img.cols, tmp);
-        //  for(int i=0;i<img.cols;i++)
-        //     {
-        //        for(int j=0;j<img.rows;j++)
-        //           {
-        //              map_vec[i][j]=img.at<int>(i,j);
-        //           }
-        //     }
-
-      return map_vec;
-    }
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -202,7 +188,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         int count = 0;
         struct coordinate  vec2;
         vec2 = generate_next_wp(pos);
-        for (int i = 0; i < 5; i ++) {
+        for (int i = 0; i < 5; i++) {
             if (map[vec2.x][vec2.y] != 1) {
                 count++;
             }

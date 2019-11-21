@@ -2,7 +2,7 @@
 #include "helper.cpp"
 #include <vector>
 #include <iostream>
-#include "geometry_msgs/PoseStamped.h"
+#include "geometry_msgs/PolygonStamped.h"
 #include <waypoint_pit_planner/waypoints.h>
 
 using namespace std;
@@ -17,26 +17,29 @@ using namespace std;
 		static int robot_y;
 
 
-void getODOM(const geometry_msgs::PoseStamped::ConstPtr& msg){
-			robot_x = (msg->pose.position.x - 2.5)/5; //check
-			robot_y	= (msg->pose.position.y - 2.5)/5; //check
+void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
+			robot_x = (msg->polygon.points[0].x - .25)/.5; //check
+			robot_y	= -1 * (msg->polygon.points[0].y - .25)/.5 ; //check
 }
 
 
 bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
 // 			// ros::NodeHandle n;
-
 			helper test;
 
 			test.set_location(robot_x,robot_y);
-
+			cout<<robot_x<<robot_y<<endl;
+				cout<<test.func()<<"func"<<endl;
+				cout<<"func"<<test.list_wp.size() <<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
 			res.wp_received = true;
 			if (res.wp_received ){
-				res.x = test.list_wp[test.list_wp.size() -1 ].x;
-				res.y = test.list_wp[test.list_wp.size() -1 ].y;
-				return false;
+				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].x)+.25;
+				res.y = -1 * (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
+				cout<<res.x<<"-------------XXXXXXfunc"<<endl;
+				cout<<res.y<<"-------------YYYYYYfunc"<<endl;
+				return true;
 			}
 			else if (res.mission_flag){
 				return true;

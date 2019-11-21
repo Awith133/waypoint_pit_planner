@@ -1,14 +1,21 @@
 //#include "helper.h"
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+// #include <opencv2/opencv.hpp>
 #include <math.h>
+#include <string>
+#include <stdlib.h> 
 using namespace std;
+
+#define MAP_FILE "./mapp.csv"
 
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
 //---------------------------------------------------------------------------------------
 struct coordinate
-{ 
+{
     int x;
     int y;
     coordinate(int x_,int y_):x(x_ ),y(y_ ){}
@@ -40,34 +47,102 @@ struct coordinate2
 //--------------------------------struct to compute-------------------------------
 //--------------------------------------------------------------------------------
 class helper {
-private: 
+private:
 	bool reached_edge_flag = false;
 
 public:
-    vector<int> seg;
-    std::vector<vector<int> > map ;
+    // vector<int> seg;
+    std::vector<vector<int> > map =  convert_csv_to_vector(MAP_FILE);
     struct coordinate  robot_position =  coordinate(10,0);
-    struct coordinate pit_centre =  coordinate(10,20);
+    struct coordinate pit_centre =  coordinate(650,650);
     struct coordinate2  dir_vec =  coordinate2();
     double min_step = 0.5; //resolution of the map
     vector<coordinate> list_wp;
-    
+
 
     helper(){
-        seg = vector<int>(10,1);
-        vector<int> seg2 = vector<int>(10,0);
-        seg.insert(seg.end(), seg2.begin(), seg2.end());
-        map = vector<vector<int> >(20, seg);
-        map[10][5] = 0;
-        map[10][6] = 0;
-        map[9][6] = 0;
-        map[9][5] = 0;
-        map[12][11] = 1;
-        map[12][10] = 1;
-        map[12][12] = 1;
-        map[8][11] = 1;
-        map[8][10] = 1;
-        map[8][12] = 1;
+
+        // seg = vector<int>(10,1);
+        // vector<int> seg2 = vector<int>(10,0);
+        // seg.insert(seg.end(), seg2.begin(), seg2.end());
+        // map = convert_csv_to_vector(MAP_FILE);//generate_map_vec();
+        //vector<vector<int> >(20, seg);
+        // map[10][5] = 0;
+        // map[10][6] = 0;
+        // map[9][6] = 0;
+        // map[9][5] = 0;
+        // map[12][11] = 1;
+        // map[12][10] = 1;
+        // map[12][12] = 1;
+        // map[8][11] = 1;
+        // map[8][10] = 1;
+        // map[8][12] = 1;
+    }
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+std::vector<int> split(const std::string& s, char delimiter)
+{
+    std::vector<int> result;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        // cout<<token<<endl;
+
+        result.push_back(stod(token));
+    }
+    return result;
+}
+
+vector<vector<int> > convert_csv_to_vector(const string &file_name)
+{
+    std::ifstream file(file_name);
+    string line;
+    string number;
+    string temp;
+    vector<vector<int> > map;
+    int count=0;
+
+    while (getline(file, line,'\n'))
+    {
+        auto res = split(line,',');
+        map.push_back(res);
+    }
+
+    // cout<<"Map_Rows: "<<map.size()<<endl;
+    // cout<<"Map_Col: "<<map[0].size()<<endl;
+
+
+    return (map);
+}
+
+
+    vector<vector<int> > generate_map_vec(){ //check convention
+      // cv::Mat img = cv::imread(MAP_FILE);
+        vector<vector<int> > map_vec;
+        // vector<int> tmp(img.rows, 0);
+        //  vector<vector<int> > map_vec(img.cols, tmp);
+        //  for(int i=0;i<img.cols;i++)
+        //     {
+        //        for(int j=0;j<img.rows;j++)
+        //           {
+        //              map_vec[i][j]=img.at<int>(i,j);
+        //           }
+        //     }
+
+      return map_vec;
+    }
+
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
+    void set_location(const int x, const int y){
+      robot_position.x = x;
+      robot_position.y = y;
+      return;
     }
 
 //--------------------------------------------------------------------------------
@@ -122,7 +197,7 @@ public:
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
-    
+
     bool edge_reached(coordinate pos, int side_shift) { //true means could not reach
         int count = 0;
         struct coordinate  vec2;

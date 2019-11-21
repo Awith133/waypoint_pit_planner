@@ -2,41 +2,113 @@
 #include "helper.cpp"
 #include <vector>
 #include <iostream>
-#include <waypoint_to_pit/waypoints.h>
+#include "geometry_msgs/PoseStamped.h"
+#include <waypoint_pit_planner/waypoints.h>
 
 using namespace std;
 
 /* The way point genenerator works as a service
-Each waypoint is generated in the neighborhood of the robot
 */
 
+#define RESOLUTION = 0.5;
+#define OFFSET = 0.25
+
+		static int robot_x;
+		static int robot_y;
 
 
-bool g_wp(waypoint_to_pit::waypoints::Request &req, waypoint_to_pit::waypoints::Response &res){
-	helper test;
-    res.wp_received = test.func();
-    res.mission_flag = test.get_reached_edge_status();
-	res.wp_received = true;
-	if (res.wp_received ){
-		res.x = test.list_wp[test.list_wp.size() -1 ].x;
-		res.y = test.list_wp[test.list_wp.size() -1 ].y;
-		return false;
-	}
-	else if (res.mission_flag){
-		return true;
-	}
-	return false;
+void getODOM(const geometry_msgs::PoseStamped::ConstPtr& msg){
+			robot_x = (msg->pose.position.x - 2.5)/5; //check
+			robot_y	= (msg->pose.position.y - 2.5)/5; //check
 }
 
 
+bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
+// 			// ros::NodeHandle n;
+
+			helper test;
+
+			test.set_location(robot_x,robot_y);
+
+		    res.wp_received = test.func();
+		    res.mission_flag = test.get_reached_edge_status();
+			res.wp_received = true;
+			if (res.wp_received ){
+				res.x = test.list_wp[test.list_wp.size() -1 ].x;
+				res.y = test.list_wp[test.list_wp.size() -1 ].y;
+				return false;
+			}
+			else if (res.mission_flag){
+				return true;
+			}
+			return false;
+
+
+}
+
+
+// class WPGEN{
+// 	public:
+// 		static int robot_x;
+// 		static int robot_y;
+// 		ros::Subscriber sub;
+// 		ros::ServiceServer service;
+// 		ros::NodeHandle n;
+
+// 		WPGEN(){
+// 			// service = n.advertiseService("gen_wp2pit", this->g_wp);
+// 			sub = n.subscribe("/move_base/local_costmap/footprint", 10, this->getODOM);
+// 			//this->n = nh;
+// 		}
+
+// 		void getODOM(geometry_msgs::PoseStamped::ConstPtr& msg){
+// 			// robot_x = (msg->pose.position.x - 2.5)/5; //check
+// 			// robot_y	= (msg->pose.position.y - 2.5)/5; //check
+// 		}
+
+
+// 		static bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
+// 			// ros::NodeHandle n;
+
+// 			helper test;
+
+// 			// test.set_location(0,0);//robot_x,robot_y);
+
+// 		 //    res.wp_received = test.func();
+// 		 //    res.mission_flag = test.get_reached_edge_status();
+// 			// res.wp_received = true;
+// 			// if (res.wp_received ){
+// 			// 	res.x = test.list_wp[test.list_wp.size() -1 ].x;
+// 			// 	res.y = test.list_wp[test.list_wp.size() -1 ].y;
+// 			// 	return false;
+// 			// }
+// 			// else if (res.mission_flag){
+// 			// 	return true;
+// 			// }
+// 			return false;
+
+// 		}
+
+// 		void run(){
+// 			// ros::NodeHandle n;
+
+// 		ros::spin();
+// 		}
+
+// };
 
 int main(int argc, char **argv){
 
-	ros::init(argc,argv, "waypoint_to_pit_server");
-
-	ros::NodeHandle n;
-	ros::ServiceServer service = n.advertiseService("gen_wp2pit", g_wp);
+	ros::init(argc,argv, "waypoint_pit_planner_server");
+		ros::Subscriber sub;
+		ros::ServiceServer service;
+		ros::NodeHandle n;
+					service = n.advertiseService("gen_wp2pit", g_wp);
+			sub = n.subscribe("/move_base/local_costmap/footprint", 10,getODOM);
+	// WPGEN tmp;
 	ros::spin();
+	// tmp.run();
+
 
 	return 0;
 }

@@ -33,7 +33,8 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				cout<<"func"<<test.list_wp.size() <<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
-			res.wp_received = true;
+			//res.wp_received = true;
+
 			if (res.wp_received ){
 				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].x)+.25;
 				res.y = -1 * (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
@@ -42,6 +43,8 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				return true;
 			}
 			else if (res.mission_flag){
+				// res.x = 0;
+				// res.y = 0;
 				return true;
 			}
 			return false;

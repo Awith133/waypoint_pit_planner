@@ -9,7 +9,7 @@
 #include <stdlib.h>
 using namespace std;
 
-#define MAP_FILE "/home/himil07/catkin_ws/src/waypoint_pit_planner/src/mapp.csv"
+#define MAP_FILE "/home/ayush/mrsd_ws/src/waypoint_pit_planner/src/mapp.csv"
 
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
@@ -54,9 +54,9 @@ public:
     // vector<int> seg;
     std::vector<vector<int> > map =  convert_csv_to_vector(MAP_FILE);
     struct coordinate  robot_position =  coordinate(10,0);
-    struct coordinate pit_centre =  coordinate(650,650);
+    struct coordinate pit_centre =  coordinate(1300,1300);
     struct coordinate2  dir_vec =  coordinate2();
-    double min_step = 2; //resolution of the map
+    double min_step = 1; //resolution of the map
     vector<coordinate> list_wp;
 
 
@@ -302,7 +302,8 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
                  }
              }
         }
-        return true;
+        cout<<"--------------------------"<<"EDGE REACHED"<<endl;
+        return false;
 
     }
 

@@ -56,7 +56,7 @@ public:
     struct coordinate  robot_position =  coordinate(10,0);
     struct coordinate pit_centre =  coordinate(1300,1300);
     struct coordinate2  dir_vec =  coordinate2();
-    double min_step = 1; //resolution of the map
+    double min_step = 3; //resolution of the map
     vector<coordinate> list_wp;
 
 
@@ -112,10 +112,6 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         // cout<<"res:" <<res.size()<<endl;
     }
 
-    // cout<<"Map_Rows: "<<map.size()<<endl;
-    // cout<<"Map_Col: "<<map[0].size()<<endl;
-
-
     return (map);
 }
 
@@ -130,6 +126,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
       robot_position.y = y;
       return;
     }
+
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -212,6 +209,25 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
 
+
+    void update_min_step(coordinate pos) { //true means could not reach
+        this->min_step = 2.5;
+        for(int i = -2; i<=2;i++){
+            for(int j = -2;j <=2; j++){
+                if(pos.x + i <map[0].size() && pos.x + i>=0){
+                    if(pos.y + j <map.size() && pos.y + j>=0){
+                        if (map[pos.x + i][pos.y + j] == 0){
+                            this->min_step = 0.75;
+                        }
+                    }
+                }
+            }
+        }
+    }
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+
     bool isTraversible(coordinate vec){
         if (map[vec.x][vec.y] == 0){
             return false;
@@ -272,6 +288,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         struct coordinate vec;
         while (!edge_reached(robot_position,0)){
              dir_vec_update();
+             update_min_step(robot_position);
              vec = generate_next_wp( robot_position);
              if (isTraversible(vec)){
                  robot_position = vec;

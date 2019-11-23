@@ -8,6 +8,7 @@
 using namespace std;
 
 /* The way point genenerator works as a service
+
 */
 
 #define RESOLUTION = 0.5;
@@ -24,32 +25,38 @@ void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 
 
 bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
-// 			// ros::NodeHandle n;
 			helper test;
 
 			test.set_location(robot_x,robot_y);
-			cout<<robot_x<<robot_y<<endl;
-				cout<<test.func()<<"func"<<endl;
-				cout<<"func"<<test.list_wp.size() <<endl;
+			cout<<"No. of Waypoint Generated"<<test.list_wp.size() <<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
-			//res.wp_received = true;
-
 			if (res.wp_received ){
 				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].x)+.25;
 				res.y = -1 * (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
-				cout<<res.x<<"-------------XXXXXXfunc"<<endl;
-				cout<<res.y<<"-------------YYYYYYfunc"<<endl;
+				cout<<"Way Point to edge Generated"<<  res.x << " " << res.y <<endl;
 				return true;
 			}
 			else if (res.mission_flag){
-				// res.x = 0;
-				// res.y = 0;
 				return true;
 			}
 			return false;
 
 
+}
+
+
+int main(int argc, char **argv){
+
+	ros::init(argc,argv, "waypoint_pit_planner_server");
+		ros::Subscriber sub;
+		ros::ServiceServer service;
+		ros::NodeHandle n;
+					service = n.advertiseService("gen_wp2pit", g_wp);
+			sub = n.subscribe("/move_base/local_costmap/footprint", 10, getODOM);
+	ros::spin();
+
+	return 0;
 }
 
 
@@ -102,23 +109,6 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 // 		}
 
 // };
-
-int main(int argc, char **argv){
-
-	ros::init(argc,argv, "waypoint_pit_planner_server");
-		ros::Subscriber sub;
-		ros::ServiceServer service;
-		ros::NodeHandle n;
-					service = n.advertiseService("gen_wp2pit", g_wp);
-			sub = n.subscribe("/move_base/local_costmap/footprint", 10,getODOM);
-	// WPGEN tmp;
-	ros::spin();
-	// tmp.run();
-
-
-	return 0;
-}
-
 
 
 

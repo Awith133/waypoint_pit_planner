@@ -2,6 +2,7 @@
 #include "helper.cpp"
 #include <vector>
 #include <iostream>
+#include <string>
 #include "geometry_msgs/PolygonStamped.h"
 #include <waypoint_pit_planner/waypoints.h>
 
@@ -16,7 +17,7 @@ using namespace std;
 
 		static int robot_x;
 		static int robot_y;
-
+		string MAP_FILE2 = "";
 
 void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 			robot_x = (msg->polygon.points[0].x - .25)/.5; //check
@@ -25,6 +26,10 @@ void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 
 
 bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
+			
+			
+			//ros::param::get("map_location", MAP_FILE);	
+		
 			helper test;
 
 			test.set_location(robot_x,robot_y);
@@ -52,6 +57,10 @@ int main(int argc, char **argv){
 		ros::Subscriber sub;
 		ros::ServiceServer service;
 		ros::NodeHandle n;
+
+	//ros::param::get("map_location", MAP_FILE);
+		//n.getParam("map_location", MAP_FILE2);
+	//cout<< MAP_FILE2 <<"bidu"<<endl;
 					service = n.advertiseService("gen_wp2pit", g_wp);
 			sub = n.subscribe("/move_base/local_costmap/footprint", 10, getODOM);
 	ros::spin();

@@ -1,5 +1,6 @@
 //#include "helper.h"
 #include <iostream>
+#include "ros/ros.h"
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -9,7 +10,10 @@
 #include <stdlib.h>
 using namespace std;
 
-#define MAP_FILE "/home/ayush/mrsd_ws/src/waypoint_pit_planner/src/mapp.csv"
+#define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
+
+
+// string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
@@ -58,10 +62,13 @@ public:
     struct coordinate2  dir_vec =  coordinate2();
     double min_step = 3; //resolution of the map
     vector<coordinate> list_wp;
+    //string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
+
 
 
     helper(){
-
+	
+	//MAP_FILE  = fname;
         // seg = vector<int>(10,1);
         // vector<int> seg2 = vector<int>(10,0);
         // seg.insert(seg.end(), seg2.begin(), seg2.end());

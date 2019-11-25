@@ -10,7 +10,7 @@
 #include <stdlib.h>
 using namespace std;
 
-#define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
+#define MAP_FILE "/home/ayush/mrsd_ws/src/waypoint_pit_planner/src/mapp.csv" 
 
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";

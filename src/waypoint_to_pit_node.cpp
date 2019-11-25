@@ -21,7 +21,7 @@ using namespace std;
 
 void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 			robot_x = (msg->polygon.points[0].x - .25)/.5; //check
-			robot_y	= -1 * (msg->polygon.points[0].y - .25)/.5 ; //check
+			robot_y	= (msg->polygon.points[0].y - .25)/.5 ; //check
 }
 
 
@@ -32,13 +32,13 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 		
 			helper test;
 
-			test.set_location(robot_x,robot_y);
+			test.set_location(-1*robot_y,robot_x);
 			cout<<"No. of Waypoint Generated"<<test.list_wp.size() <<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
 			if (res.wp_received ){
-				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].x)+.25;
-				res.y = -1 * (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
+				res.y = (-1 * (.5*test.list_wp[test.list_wp.size() -1 ].x))+.25;
+				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
 				cout<<"Way Point to edge Generated"<<  res.x << " " << res.y <<endl;
 				return true;
 			}

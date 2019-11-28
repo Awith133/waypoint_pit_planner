@@ -10,8 +10,8 @@
 #include <stdlib.h>
 using namespace std;
 
-#define MAP_FILE "/home/ayush/mrsd_ws/src/waypoint_pit_planner/src/mapp.csv" 
-
+#define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
+#define PI 3.14
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
@@ -62,9 +62,16 @@ public:
     struct coordinate2  dir_vec =  coordinate2();
     double min_step = 3; //resolution of the map
     vector<coordinate> list_wp;
+    double dir_yaw;
     //string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
-
+    double get_direction_vec(){
+        double i = PI/2 +(( atan2(dir_vec.y, dir_vec.x)));
+        if (i<0){
+            i += 2*PI;
+        }
+        return i;
+    }
 
     helper(){
 	
@@ -193,6 +200,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         struct coordinate  vec2;
         vec2 = generate_next_wp(pos);
         for (int i = 0; i < 5; i++) {
+            cout<<map[vec2.x][vec2.y]<< " ";
             if (map[vec2.x][vec2.y] != 1) {
                 count++;
             }
@@ -224,7 +232,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
                 if(pos.x + i <map[0].size() && pos.x + i>=0){
                     if(pos.y + j <map.size() && pos.y + j>=0){
                         if (map[pos.x + i][pos.y + j] == 0){
-                            this->min_step = 0.75;
+                            this->min_step = 0.5;
                         }
                     }
                 }

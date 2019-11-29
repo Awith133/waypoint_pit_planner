@@ -32,12 +32,13 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				return false;
 			}
 			test.set_location(robot_y,robot_x);
-			cout<<robot_x<<robot_y<<endl;
-				cout<<test.func()<<"func"<<endl;
-				cout<<"func"<<test.list_wp.size() <<endl;
+			// cout<<robot_x<<robot_y<<endl;
+				// cout<<test.func()<<"func"<<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
-			//res.wp_received = true;
+			cout << "Waypoints Generated: "<< test.list_wp.size() << "Mission Flag: " << res.mission_flag <<endl;
+			
+				//res.wp_received = true;
 			if (res.mission_flag){
 				// res.x = 0;
 				// res.y = 0;

@@ -12,6 +12,8 @@ using namespace std;
 
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
 #define PI 3.14
+#define MIN_STEP_GENERAL 2.5
+#define MIN_STEP_TO_EDGE 0.75
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
@@ -60,13 +62,13 @@ public:
     struct coordinate  robot_position =  coordinate(10,0);
     struct coordinate pit_centre =  coordinate(1300,1300);
     struct coordinate2  dir_vec =  coordinate2();
-    double min_step = 3; //resolution of the map
+    double min_step = MIN_STEP_GENERAL; //resolution of the map
     vector<coordinate> list_wp;
     double dir_yaw;
     //string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
     double get_direction_vec(){
-        double i = PI/2 +(( atan2(dir_vec.y, dir_vec.x)));
+        double i = -PI/2 +(( atan2(dir_vec.y, dir_vec.x)));
         if (i<0){
             i += 2*PI;
         }
@@ -200,7 +202,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         struct coordinate  vec2;
         vec2 = generate_next_wp(pos);
         for (int i = 0; i < 5; i++) {
-            cout<<map[vec2.x][vec2.y]<< " ";
+            // cout<<map[vec2.x][vec2.y]<< " ";
             if (map[vec2.x][vec2.y] != 1) {
                 count++;
             }
@@ -226,13 +228,13 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
 
     void update_min_step(coordinate pos) { //true means could not reach
-        this->min_step = 2.5;
+        this->min_step = MIN_STEP_GENERAL;
         for(int i = -2; i<=2;i++){
             for(int j = -2;j <=2; j++){
                 if(pos.x + i <map[0].size() && pos.x + i>=0){
                     if(pos.y + j <map.size() && pos.y + j>=0){
                         if (map[pos.x + i][pos.y + j] == 0){
-                            this->min_step = 0.5;
+                            this->min_step = MIN_STEP_TO_EDGE;
                         }
                     }
                 }

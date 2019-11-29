@@ -3,4 +3,4 @@ bool mission_flag
 bool wp_received
 int32 x
 int32 y
-int32 z
+int32 yaw

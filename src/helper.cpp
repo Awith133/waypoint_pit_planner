@@ -69,7 +69,7 @@ public:
 
     double get_direction_vec(){
         double i = -PI/2 +(( atan2(dir_vec.y, dir_vec.x)));
-        if (i<0){
+        if (i<=-PI){
             i += 2*PI;
         }
         return i;
@@ -184,6 +184,8 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
     void dir_vec_update(){
+        cout<<"Pit center at "<< pit_centre.x<<" "<< pit_centre.y<<endl;
+        cout<<"Robot at "<< robot_position.x<<" "<< robot_position.y<<endl;
         dir_vec.x = pit_centre.x - robot_position.x;
         dir_vec.y = pit_centre.y - robot_position.y;
         double tmp = sqrt(pow(dir_vec.x,2) + pow(dir_vec.y,2));

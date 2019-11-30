@@ -31,9 +31,9 @@ void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 				sum_x += msg->polygon.points[i].x;
 				sum_y += msg->polygon.points[i].y;
 			}
-
-			robot_x = sum_x/n;
-			robot_y = -1 * sum_y/n;
+			//flipped from rviz to image
+			robot_y = (sum_x/n )/0.5; 
+			robot_x = -1 * (sum_y/n )/0.5;
 			odom_received = true;
 }
 
@@ -44,7 +44,8 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 			if (!odom_received){
 				return false;
 			}
-			test.set_location(robot_y,robot_x);
+			
+			test.set_location(robot_x,robot_y);
 			// cout<<robot_x<<robot_y<<endl;
 				// cout<<test.func()<<"func"<<endl;
 		    res.wp_received = test.func();
@@ -58,9 +59,12 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				return true;}
 			if (res.wp_received ){
 				res.yaw = test.get_direction_vec();
-				res.y = (-1 * (.5*test.list_wp[test.list_wp.size() -1 ].x))+.25;
+				res.y = (-1 * (.5*test.list_wp[test.list_wp.size() -1 ].x))-0.25;
 				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
-				cout<<"Way Point to edge Generated"<<  res.x << " " << res.y <<endl;
+				cout<<"Robot Position "<<robot_x<<"  "<<robot_y<<endl;
+				cout<<"Direction Vector " <<test.dir_vec.x<<" "<<test.dir_vec.y<<endl;
+				cout<<"Image Point Generated "<<  test.list_wp[test.list_wp.size() -1 ].x << " " << test.list_wp[test.list_wp.size() -1 ].y <<endl;
+				cout<<"Way Point to edge Generated "<<  res.x << " " << res.y <<endl;
 				return true;
 			}
 			else if (res.mission_flag){

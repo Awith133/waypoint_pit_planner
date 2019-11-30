@@ -12,7 +12,7 @@ using namespace std;
 
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
 #define PI 3.14
-#define MIN_STEP_GENERAL 2.5
+#define MIN_STEP_GENERAL 4
 #define MIN_STEP_TO_EDGE 0.75
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
@@ -20,14 +20,28 @@ using namespace std;
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
 //---------------------------------------------------------------------------------------
+// struct coordinate
+// {
+//     int x;
+//     int y;
+//     coordinate(int x_,int y_):x(x_ ),y(y_ ){}
+//     coordinate(): x(0), y(0){ };
+
+//     void set_coordinate(int a, int b){
+//         x = (a);
+//         y = (b);
+//     }
+
+// };
+
 struct coordinate
 {
-    int x;
-    int y;
-    coordinate(int x_,int y_):x(x_ ),y(y_ ){}
+    double x;
+    double y;
+    coordinate(double x_,double y_):x(x_ ),y(y_ ){}
     coordinate(): x(0), y(0){ };
 
-    void set_coordinate(int a, int b){
+    void set_coordinate(double a, double b){
         x = (a);
         y = (b);
     }
@@ -150,7 +164,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
     coordinate generate_next_wp(coordinate  curr_pos){
         struct coordinate vec;
-        vec.set_coordinate(ceil(curr_pos.x +  dir_vec.x) ,ceil(curr_pos.y + dir_vec.y) );
+        vec.set_coordinate((int)(curr_pos.x + min_step * dir_vec.x) ,(int)(curr_pos.y + min_step * dir_vec.y) ); //was using ceil when coordinate was int
         return vec;
     }
 
@@ -189,8 +203,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         double tmp = sqrt(pow(dir_vec.x,2) + pow(dir_vec.y,2));
         dir_vec.x/= tmp;
         dir_vec.y/=tmp;
-        dir_vec.x*= min_step;
-        dir_vec.y*=min_step;
+        
     }
 
 //--------------------------------------------------------------------------------
@@ -203,7 +216,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         vec2 = generate_next_wp(pos);
         for (int i = 0; i < 5; i++) {
             // cout<<map[vec2.x][vec2.y]<< " ";
-            if (map[vec2.x][vec2.y] != 1) {
+            if (map[(int)vec2.x][(int)vec2.y] != 1) {
                 count++;
             }
             vec2 = generate_next_wp(vec2);
@@ -228,12 +241,14 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
 
     void update_min_step(coordinate pos) { //true means could not reach
+    int x = (int)pos.x;
+    int y = (int)pos.y;
         this->min_step = MIN_STEP_GENERAL;
         for(int i = -2; i<=2;i++){
             for(int j = -2;j <=2; j++){
-                if(pos.x + i <map[0].size() && pos.x + i>=0){
-                    if(pos.y + j <map.size() && pos.y + j>=0){
-                        if (map[pos.x + i][pos.y + j] == 0){
+                if( x + i <map[0].size() && x + i>=0){
+                    if(y + j <map.size() && y + j>=0){
+                        if (map[x + i][y + j] == 0){
                             this->min_step = MIN_STEP_TO_EDGE;
                         }
                     }
@@ -246,7 +261,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 
     bool isTraversible(coordinate vec){
-        if (map[vec.x][vec.y] == 0){
+        if (map[(int)vec.x][(int)vec.y] == 0){
             return false;
         }
         return true;
@@ -261,9 +276,9 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         coordinate vec_originial = vecc;
         while(!isTraversible(vecc) && count < 5){
             if(dir_vec.x > dir_vec.y)
-                vecc = coordinate( (vecc.x ), (vecc.y-signn(dir_vec.y)));
+                vecc = coordinate( (int)(vecc.x ), (int)(vecc.y-(dir_vec.y)));
             else
-                vecc = coordinate( (vecc.x-signn(dir_vec.x)),  (vecc.y));
+                vecc = coordinate( (int)(vecc.x-(dir_vec.x)),  (int)(vecc.y));
             count++;
         }
         if (count == 5){
@@ -281,10 +296,10 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         struct coordinate vec_originial = vec;
         while(!isTraversible(vec)){
             if(dir_vec.x > dir_vec.y)
-                vec = coordinate( (vec.x ), (vec.y+signn(dir_vec.y)));
+                vec = coordinate( (int)(vec.x ), (int)(vec.y+(dir_vec.y)));
 
             else
-                vec = coordinate( (vec.x+signn(dir_vec.x)),  (vec.y));
+                vec = coordinate( (int)(vec.x+(dir_vec.x)),  (int)(vec.y));
             count++;
            if(count > 5){
                break;
@@ -310,6 +325,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
              if (isTraversible(vec)){
                  robot_position = vec;
                  list_wp.push_back(vec);
+                 cout<<"Going Straight"<<endl;
                  return true;
              }
              else{
@@ -325,6 +341,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 							 vec = vec_right;
 							 robot_position = vec;
 							 list_wp.push_back(vec);
+                             cout<<"Going Right"<<endl;
 							 return true;
 						}
 	                }
@@ -332,6 +349,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
                      vec = vec_left;
                      robot_position = vec;
                      list_wp.push_back(vec);
+                     cout<<"Going Left"<<endl;
                      return true;
                  }
              }

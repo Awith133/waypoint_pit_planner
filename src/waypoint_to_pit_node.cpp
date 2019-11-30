@@ -13,14 +13,27 @@ using namespace std;
 #define RESOLUTION = 0.5;
 #define OFFSET = 0.25
 
-		static int robot_x ;
-		static int robot_y ;
+		static double robot_x ;
+		static double robot_y ;
 		bool odom_received = false;
 
 
+
+
 void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
-			robot_x = (msg->polygon.points[0].x - .25)/.5; //check
-			robot_y	= -1 * (msg->polygon.points[0].y - .25)/.5 ; //check
+			
+			double sum_x =0;
+			double sum_y = 0;
+			int n = msg->polygon.points.size();
+
+			for (int i=0;i<n;i++)
+			{
+				sum_x += msg->polygon.points[i].x;
+				sum_y += msg->polygon.points[i].y;
+			}
+
+			robot_x = sum_x/n;
+			robot_y = -1 * sum_y/n;
 			odom_received = true;
 }
 

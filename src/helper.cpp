@@ -11,7 +11,7 @@
 using namespace std;
 
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
-#define PI 3.14
+#define PI 3.14159265359
 #define MIN_STEP_GENERAL 4
 #define MIN_STEP_TO_EDGE 0.75
 

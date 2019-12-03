@@ -38,6 +38,51 @@ void getODOM(const geometry_msgs::PolygonStamped::ConstPtr& msg){
 }
 
 
+	void get_patch(int x, int y, vector<vector<int> > &map) { //true means could not reach
+
+        for(int i = -2; i<=2;i++){
+        	for(int j = -2;j <=2; j++){
+	    	
+                if( x + i <map[0].size() && x + i>=0){
+                    if(y + j <map.size() && y + j>=0){
+                        cout<<map[x+i][y+j];
+                    }
+                }
+            }
+			cout<<endl;
+        }
+    }
+
+	void get_patch2(int x, int y, vector<vector<int> > &map) { //true means could not reach
+
+        for(int i = -100; i<100;i++){
+        	for(int j = -100;j <100; j++){
+	    	
+                if( x + i <map[0].size() && x + i>=0){
+                    if(y + j <map.size() && y + j>=0){
+                        cout<<map[x+i][y+j];
+                    }
+                }
+
+            }
+			cout<<endl;
+        }
+    }
+
+
+	void get_patch_rob_dir(int x, int y, vector<vector<int> > &map,helper& test) { //true means could not reach
+		struct coordinate vec;
+		struct coordinate vec1 = coordinate(x,y);
+		vec = test.generate_next_wp_edge_checker(vec1, "get_patch_rob_dir");
+        for(int i = 0; i<10;i++){
+                   cout<< "Kuch bhi "<< vec.x <<" "<< vec.y<< " " <<map[vec.x][vec.y]<< endl;
+                   vec = test.generate_next_wp_edge_checker(vec, "get_patch_rob_dir");
+            }
+			cout<<endl;
+	}
+    
+
+
 bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::waypoints::Response &res){
 // 			// ros::NodeHandle n;
 			helper test;
@@ -50,7 +95,7 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				// cout<<test.func()<<"func"<<endl;
 		    res.wp_received = test.func();
 		    res.mission_flag = test.get_reached_edge_status();
-			cout << "Waypoints Generated: "<< test.list_wp.size() << "Mission Flag: " << res.mission_flag <<endl;
+			// cout << "Waypoints Generated: "<< test.list_wp.size() << "Mission Flag: " << res.mission_flag <<endl;
 			
 				//res.wp_received = true;
 			if (res.mission_flag){
@@ -58,7 +103,26 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				// res.y = 0;
 				return true;}
 			if (res.wp_received ){
-				res.yaw = test.get_direction_vec();
+
+				// cout<< "Min step  "<< test.min_step<<endl;
+				// cout<<"Direction Vector " <<test.dir_vec.x<<" "<<test.dir_vec.y<<endl;
+				// cout<<"Patch around robot " <<endl;
+				// get_patch(robot_x, robot_y,test.map);
+				// cout<< "Looking at edge "<<endl;
+				// get_patch_rob_dir(robot_x, robot_y,test.map,  test) ;
+				// cout<<" Bigger Patch around robot " <<endl;
+				// get_patch2(robot_x, robot_y,test.map);
+
+				coordinate wp_coord = coordinate(test.list_wp[test.list_wp.size() -1 ].x, test.list_wp[test.list_wp.size() -1 ].y);
+				if(test.edge_reached(wp_coord, 0)){
+
+					//res.yaw = 100;
+					res.yaw = test.get_direction_vec();
+				}
+				else{
+					res.yaw = test.get_direction_vec();
+				}
+				
 				res.y = (-1 * (.5*test.list_wp[test.list_wp.size() -1 ].x))-0.25;
 				res.x = (.5*test.list_wp[test.list_wp.size() -1 ].y)+.25;
 				cout<<"Robot Position "<<robot_x<<"  "<<robot_y<<endl;
@@ -68,8 +132,6 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				return true;
 			}
 			else if (res.mission_flag){
-				// res.x = 0;
-				// res.y = 0;
 				return true;
 			}
 			return false;

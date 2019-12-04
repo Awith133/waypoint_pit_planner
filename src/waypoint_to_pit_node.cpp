@@ -108,10 +108,10 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				// cout<<"Direction Vector " <<test.dir_vec.x<<" "<<test.dir_vec.y<<endl;
 				// cout<<"Patch around robot " <<endl;
 				// get_patch(robot_x, robot_y,test.map);
-				// cout<< "Looking at edge "<<endl;
-				// get_patch_rob_dir(robot_x, robot_y,test.map,  test) ;
-				// cout<<" Bigger Patch around robot " <<endl;
-				// get_patch2(robot_x, robot_y,test.map);
+				cout<< "Looking at edge "<<endl;
+				get_patch_rob_dir(robot_x, robot_y,test.map,  test) ;
+				cout<<" Bigger Patch around robot " <<endl;
+				get_patch2(robot_x, robot_y,test.map);
 
 				coordinate wp_coord = coordinate(test.list_wp[test.list_wp.size() -1 ].x, test.list_wp[test.list_wp.size() -1 ].y);
 				if(test.edge_reached(wp_coord, 0)){

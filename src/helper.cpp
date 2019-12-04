@@ -12,8 +12,8 @@ using namespace std;
 
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
 #define PI 3.14159265359
-#define MIN_STEP_GENERAL 1
-#define MIN_STEP_TO_EDGE 0.75
+#define MIN_STEP_GENERAL 2
+#define MIN_STEP_TO_EDGE 1
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
@@ -186,6 +186,12 @@ coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
 
     }
 
+    coordinate generate_next_wp_float(coordinate  curr_pos){
+        struct coordinate vec;
+        vec.set_coordinate((curr_pos.x + min_step * dir_vec.x) ,(curr_pos.y + min_step * dir_vec.y) ); //was using ceil when coordinate was int
+        return vec;
+    }
+
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -235,7 +241,7 @@ coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
         int count = 0;
         struct coordinate  vec2;
         vec2 = generate_next_wp_edge_checker(pos, "edge_reached");
-        for (int i = 0; i <= 7; i++) {
+        for (int i = 0; i <= 5; i++) {
             cout<<"Inside edge Reached "<< (int)vec2.x<<" " <<(int)vec2.y<< " " <<map[(int)vec2.y][(int)vec2.x] << endl;
             if (map[(int)vec2.x][(int)vec2.y] != 1) {
                 count++;
@@ -344,38 +350,39 @@ coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
         while (!edge_reached(robot_position,0)){
              dir_vec_update();
              update_min_step(robot_position);
-             vec = generate_next_wp( robot_position);
+            //  vec = generate_next_wp( robot_position);
+             vec = generate_next_wp_float( robot_position);
              if (isTraversible(vec)){
                  robot_position = vec;
                  list_wp.push_back(vec);
                  cout<<"Going Straight"<<endl;
                  return true;
              }
-             else{
-                 coordinate vec_left = get_traversible_left(vec);
-                 if (vec_left.x == vec.x && vec_left.y == vec.y )
-	                {
-						coordinate vec_right = get_traversible_right(vec);
-						if (vec_right.x == vec.x && vec_right.y == vec.y ){
-						 	return false;
-						}
-						else
-						{
-							 vec = vec_right;
-							 robot_position = vec;
-							 list_wp.push_back(vec);
-                             cout<<"Going Right"<<endl;
-							 return true;
-						}
-	                }
-                 else{
-                     vec = vec_left;
-                     robot_position = vec;
-                     list_wp.push_back(vec);
-                     cout<<"Going Left"<<endl;
-                     return true;
-                 }
-             }
+            //  else{
+            //      coordinate vec_left = get_traversible_left(vec);
+            //      if (vec_left.x == vec.x && vec_left.y == vec.y )
+	        //         {
+			// 			coordinate vec_right = get_traversible_right(vec);
+			// 			if (vec_right.x == vec.x && vec_right.y == vec.y ){
+			// 			 	return false;
+			// 			}
+			// 			else
+			// 			{
+			// 				 vec = vec_right;
+			// 				 robot_position = vec;
+			// 				 list_wp.push_back(vec);
+            //                  cout<<"Going Right"<<endl;
+			// 				 return true;
+			// 			}
+	        //         }
+            //      else{
+            //          vec = vec_left;
+            //          robot_position = vec;
+            //          list_wp.push_back(vec);
+            //          cout<<"Going Left"<<endl;
+            //          return true;
+            //      }
+            //  }
         }
         cout<<"--------------------------"<<"EDGE REACHED"<<endl;
         return false;

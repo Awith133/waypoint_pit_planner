@@ -116,8 +116,8 @@ bool g_wp(waypoint_pit_planner::waypoints::Request &req, waypoint_pit_planner::w
 				coordinate wp_coord = coordinate(test.list_wp[test.list_wp.size() -1 ].x, test.list_wp[test.list_wp.size() -1 ].y);
 				if(test.edge_reached(wp_coord, 0)){
 
-					//res.yaw = 100;
-					res.yaw = test.get_direction_vec();
+					res.yaw = 100;
+					// res.yaw = test.get_direction_vec();
 				}
 				else{
 					res.yaw = test.get_direction_vec();

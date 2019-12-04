@@ -11,8 +11,8 @@
 using namespace std;
 
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
-#define PI 3.14
-#define MIN_STEP_GENERAL 2.5
+#define PI 3.14159265359
+#define MIN_STEP_GENERAL 1
 #define MIN_STEP_TO_EDGE 0.75
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
@@ -20,14 +20,28 @@ using namespace std;
 //---------------------------------------------------------------------------------------
 //----------------------------stores exact cordinaties - Used ---------------------------
 //---------------------------------------------------------------------------------------
+// struct coordinate
+// {
+//     int x;
+//     int y;
+//     coordinate(int x_,int y_):x(x_ ),y(y_ ){}
+//     coordinate(): x(0), y(0){ };
+
+//     void set_coordinat(int a, int b){
+//         x = (a);
+//         y = (b);
+//     }
+
+// };
+
 struct coordinate
 {
-    int x;
-    int y;
-    coordinate(int x_,int y_):x(x_ ),y(y_ ){}
+    double x;
+    double y;
+    coordinate(double x_,double y_):x(x_ ),y(y_ ){}
     coordinate(): x(0), y(0){ };
 
-    void set_coordinate(int a, int b){
+    void set_coordinate(double a, double b){
         x = (a);
         y = (b);
     }
@@ -68,11 +82,13 @@ public:
     //string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
     double get_direction_vec(){
+
         double i = -PI/2 +(( atan2(dir_vec.y, dir_vec.x)));
         if (i<0){
             i += 2*PI;
         }
         return i;
+
     }
 
     helper(){
@@ -127,7 +143,12 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         map.push_back(res);
         // cout<<"res:" <<res.size()<<endl;
     }
-
+    // for (int j = 0 ; j <3; j++){
+    // for (int i = 0; i<50;i++){
+    // cout<<map[0][i];
+    // }
+    // cout<<endl;
+    // }
     return (map);
 }
 
@@ -150,9 +171,21 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
     coordinate generate_next_wp(coordinate  curr_pos){
         struct coordinate vec;
-        vec.set_coordinate(ceil(curr_pos.x +  dir_vec.x) ,ceil(curr_pos.y + dir_vec.y) );
+        vec.set_coordinate((int)(curr_pos.x + min_step * dir_vec.x) ,(int)(curr_pos.y + min_step * dir_vec.y) ); //was using ceil when coordinate was int
         return vec;
     }
+//
+
+coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
+
+        struct coordinate vec;
+        // cout << caller << endl;
+        // cout << "Direction vector " << dir_vec.x << " " <<dir_vec.y << endl;
+        vec.set_coordinate((int)(curr_pos.x + signn(dir_vec.x)) ,(int)(curr_pos.y + signn(dir_vec.y)) ); //was using ceil when coordinate was int
+        return vec;
+
+    }
+
 
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
@@ -184,13 +217,13 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------
     void dir_vec_update(){
+
         dir_vec.x = pit_centre.x - robot_position.x;
         dir_vec.y = pit_centre.y - robot_position.y;
         double tmp = sqrt(pow(dir_vec.x,2) + pow(dir_vec.y,2));
         dir_vec.x/= tmp;
         dir_vec.y/=tmp;
-        dir_vec.x*= min_step;
-        dir_vec.y*=min_step;
+        
     }
 
 //--------------------------------------------------------------------------------
@@ -198,27 +231,29 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 
     bool edge_reached(coordinate pos, int side_shift) { //true means could not reach
+        // cout<<"---------------------------------------------------------------"<<endl;
         int count = 0;
         struct coordinate  vec2;
-        vec2 = generate_next_wp(pos);
-        for (int i = 0; i < 5; i++) {
-            // cout<<map[vec2.x][vec2.y]<< " ";
-            if (map[vec2.x][vec2.y] != 1) {
+        vec2 = generate_next_wp_edge_checker(pos, "edge_reached");
+        for (int i = 0; i <= 7; i++) {
+            cout<<"Inside edge Reached "<< (int)vec2.x<<" " <<(int)vec2.y<< " " <<map[(int)vec2.y][(int)vec2.x] << endl;
+            if (map[(int)vec2.x][(int)vec2.y] != 1) {
                 count++;
             }
-            vec2 = generate_next_wp(vec2);
+            // cout<<" counter  : "<< count<<endl;
+            vec2 = generate_next_wp_edge_checker(vec2, "edge_reached");
         }
         if(side_shift >3){
         	this->reached_edge_flag = true;
             return true;
-
         }
         if (count>4){
-            if(edge_reached(coordinate(pos.x , (pos.y-signn(dir_vec.y))), side_shift+1)
-               && edge_reached(coordinate(pos.x , (pos.y+signn(dir_vec.y))),side_shift+1)){
-               	this->reached_edge_flag = true;
+            // if(edge_reached(coordinate(pos.x , (pos.y-signn(dir_vec.y))), side_shift+1)
+            //    && edge_reached(coordinate(pos.x , (pos.y+signn(dir_vec.y))),side_shift+1)){
+            //    	this->reached_edge_flag = true;
+                this->reached_edge_flag = true;
                 return true;
-            }
+            // }
         }
         return false;
     }
@@ -228,12 +263,14 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
 
     void update_min_step(coordinate pos) { //true means could not reach
+        int x = (int)pos.x;
+        int y = (int)pos.y;
         this->min_step = MIN_STEP_GENERAL;
         for(int i = -2; i<=2;i++){
             for(int j = -2;j <=2; j++){
-                if(pos.x + i <map[0].size() && pos.x + i>=0){
-                    if(pos.y + j <map.size() && pos.y + j>=0){
-                        if (map[pos.x + i][pos.y + j] == 0){
+                if( x + i <map[0].size() && x + i>=0){
+                    if(y + j <map.size() && y + j>=0){
+                        if (map[x + i][y + j] == 0){
                             this->min_step = MIN_STEP_TO_EDGE;
                         }
                     }
@@ -246,7 +283,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 //--------------------------------------------------------------------------------
 
     bool isTraversible(coordinate vec){
-        if (map[vec.x][vec.y] == 0){
+        if (map[(int)vec.x][(int)vec.y] == 0){
             return false;
         }
         return true;
@@ -261,9 +298,9 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         coordinate vec_originial = vecc;
         while(!isTraversible(vecc) && count < 5){
             if(dir_vec.x > dir_vec.y)
-                vecc = coordinate( (vecc.x ), (vecc.y-signn(dir_vec.y)));
+                vecc = coordinate( (int)(vecc.x ), (int)(vecc.y-this->min_step*(dir_vec.y)));
             else
-                vecc = coordinate( (vecc.x-signn(dir_vec.x)),  (vecc.y));
+                vecc = coordinate( (int)(vecc.x-this->min_step*(dir_vec.x)),  (int)(vecc.y));
             count++;
         }
         if (count == 5){
@@ -281,10 +318,10 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
         struct coordinate vec_originial = vec;
         while(!isTraversible(vec)){
             if(dir_vec.x > dir_vec.y)
-                vec = coordinate( (vec.x ), (vec.y+signn(dir_vec.y)));
+                vec = coordinate( (int)(vec.x ), (int)(vec.y+ this->min_step*(dir_vec.y)));
 
             else
-                vec = coordinate( (vec.x+signn(dir_vec.x)),  (vec.y));
+                vec = coordinate( (int)(vec.x+this->min_step*(dir_vec.x)),  (int)(vec.y));
             count++;
            if(count > 5){
                break;
@@ -303,6 +340,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 
     bool func(){
         struct coordinate vec;
+        dir_vec_update();
         while (!edge_reached(robot_position,0)){
              dir_vec_update();
              update_min_step(robot_position);
@@ -310,6 +348,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
              if (isTraversible(vec)){
                  robot_position = vec;
                  list_wp.push_back(vec);
+                 cout<<"Going Straight"<<endl;
                  return true;
              }
              else{
@@ -325,6 +364,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
 							 vec = vec_right;
 							 robot_position = vec;
 							 list_wp.push_back(vec);
+                             cout<<"Going Right"<<endl;
 							 return true;
 						}
 	                }
@@ -332,6 +372,7 @@ vector<vector<int> > convert_csv_to_vector(const string &file_name)
                      vec = vec_left;
                      robot_position = vec;
                      list_wp.push_back(vec);
+                     cout<<"Going Left"<<endl;
                      return true;
                  }
              }

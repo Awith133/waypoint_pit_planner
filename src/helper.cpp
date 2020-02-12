@@ -13,7 +13,7 @@ using namespace std;
 #define MAP_FILE "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv" 
 #define PI 3.14159265359
 #define MIN_STEP_GENERAL 2
-#define MIN_STEP_TO_EDGE 1
+#define MIN_STEP_TO_EDGE 1.5
 
 // string MAP_FILE = "/home/hash/catkin_ws/src/waypoint_pit_planner/src/mapp.csv";
 
@@ -188,6 +188,7 @@ coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
 
     coordinate generate_next_wp_float(coordinate  curr_pos){
         struct coordinate vec;
+        // cout<< "STEP SIZE: "<< sqrt(pow(min_step * dir_vec.x,2) + pow(min_step * dir_vec.y,2)) << " "<< curr_pos.x << " "<< curr_pos.y <<" "<< dir_vec.x << " "<< dir_vec.y <<endl;
         vec.set_coordinate((curr_pos.x + min_step * dir_vec.x) ,(curr_pos.y + min_step * dir_vec.y) ); //was using ceil when coordinate was int
         return vec;
     }
@@ -242,7 +243,7 @@ coordinate generate_next_wp_edge_checker(coordinate  curr_pos, string caller){
         struct coordinate  vec2;
         vec2 = generate_next_wp_edge_checker(pos, "edge_reached");
         for (int i = 0; i <= 5; i++) {
-            cout<<"Inside edge Reached "<< (int)vec2.x<<" " <<(int)vec2.y<< " " <<map[(int)vec2.y][(int)vec2.x] << endl;
+            // cout<<"Inside edge Reached "<< (int)vec2.x<<" " <<(int)vec2.y<< " " <<map[(int)vec2.y][(int)vec2.x] << endl;
             if (map[(int)vec2.x][(int)vec2.y] != 1) {
                 count++;
             }
